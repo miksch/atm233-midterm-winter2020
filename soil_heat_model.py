@@ -12,6 +12,7 @@ from datashader import transfer_functions as tf
 #1. Define the boundary conditions
 # Needed: surface temperature forcing (sin wave at the surce), temperature profile (intinal conditions), bottom boundary
 # condition, time step, grid size, thermal conductivity, n (number of vertical grid cells)
+
 """
 # Define set up of the parameters of the model
 n = 1500 # number of vertical grids (includes top and bottom)
@@ -23,9 +24,11 @@ kap = 8e-7 # soil diffusivity (m2 s-1)
 la = (dt*kap)/(dz**2) # la as defined with dt*kappa/dz^2 (unitless)
 time_steps = 84600*7 # number of time steps to calculate
 T_bar = 20. # Average temperature of bottom layer
-A = 10. # Amplitude of sine wave for surface layer"""
+A = 10. # Amplitude of sine wave for surface layer
+"""
 
-"""## Set of parameters we used with a decent looking output
+"""
+## Set of parameters we used with a decent looking output
 ## (uncomment by taking away triple quotes)
 # Define set up of the parameters of the model
 n = 30 # number of vertical grids (includes top and bottom)
@@ -37,19 +40,20 @@ kap = 8e-7 # soil diffusivity (m2 s-1)
 la = (dt*kap)/(dz**2) # la as defined with dt*kappa/dz^2 (unitless)
 time_steps = 200 # number of time steps to calculate
 T_bar = 20. # Average temperature of bottom layer
-A = 10. # Amplitude of sine wave for surface layer"""
+A = 10. # Amplitude of sine wave for surface layer
+"""
 
 ## Set of parameters we used with a decent looking output
 ## (uncomment by taking away triple quotes)
 # Define set up of the parameters of the model
-n = 10 # number of vertical grids (includes top and bottom)
+n = 150 # number of vertical grids (includes top and bottom)
 n_coeffs = n-2 # number of coefficients for the tridiag solver
-dz = 0.05 # vertical grid spacing (in meters)
-dt = 3600 # time step in seconds
+dz = 0.01 # vertical grid spacing (in meters)
+dt = 1800 # time step in seconds
 depth = dz * n # the depth of the soil modeled
 kap = 8e-7 # soil diffusivity (m2 s-1)
 la = (dt*kap)/(dz**2) # la as defined with dt*kappa/dz^2 (unitless)
-time_steps = 10 # number of time steps to calculate
+time_steps = 400 # number of time steps to calculate
 T_bar = 20. # Average temperature of bottom layer
 A = 10. # Amplitude of sine wave for surface layer
 
@@ -130,7 +134,6 @@ def temp_surface(tao, T_bar, A):
 
     return T
 
-
 # Initialize boundary conditions in Temps array
 Temps[0, :] = temp_surface(tao, T_bar, A)  # Surface temperature
 Temps[-1, :] = T_bar  # Temperature at lower boundary
@@ -173,7 +176,7 @@ for i, t in enumerate(tao[1:-1]):
         coeffs[depth, 2] = -la
         coeffs[depth, 3] = Temps[depth, Temp_idx - 1]
 
-    print(coeffs)
+    #print(coeffs)
 
     Temps[1:-1, Temp_idx] = TDMAsolver(coeffs)
 
@@ -201,6 +204,7 @@ print(f"No vectorization: {time_novec},\n Vectorized: {time_vec}")
 ## Save output (in case of large file
 # Create grid to plot on (time is in hours)
 x, y = np.meshgrid(tao, depths)
+print(x, y)
 
 da = xr.DataArray(Temps, coords=[('depth',depths), ('tau',tao)]).to_dataset(name='temp')
 da.to_netcdf(f'data/dt_{dt}_dz_{dz}_data.nc')
@@ -208,21 +212,22 @@ da.to_netcdf(f'data/dt_{dt}_dz_{dz}_data.nc')
 ## Sample output plot
 # NOTE: does not work for large (e.g. 1 billion) points, need to use
 # a different plotting package like datashade
-fig, ax = plt.subplots(**{'figsize':(10,5)})
-
-
+fig, (ax1, ax2) = plt.subplots(nrows=2, **{'figsize':(10,10)})
 
 # Plot temperatures
 try:
-    temp_plt = ax.pcolormesh(x, y, Temps)
+    # temp_plt = ax.pcolormesh(x, y, Temps)
     # temp_plt = ax.contourf(x, y, Temps) # Contour plot
+    temp_plt = ax1.pcolormesh(Temps[:30,:])
+    # plt2 = ax2.pcolormesh(x, y, Temps)
 
-    ax.set_xlabel('Time [hr]')
-    ax.set_ylabel('Depth [m]')
+    ax1.set_xlabel('Time [hr]')
+    ax1.set_ylabel('Depth [m]')
 
-    fig.colorbar(temp_plt)
+    #fig.colorbar(temp_plt)
 
-    plt.savefig(f"figures/dt_{dt}_{dz}_output.png", dpi=300)
+    plt.savefig(f"figures/dt_{dt}_{dz}_output_xy_subset_2.png", dpi=300)
+
 
 except Exception as e:
     print(e)

@@ -45,11 +45,11 @@ A = 10. # Amplitude of sine wave for surface layer"""
 n = 30  # number of vertical grids (includes top and bottom)
 n_coeffs = n - 2  # number of coefficients for the tridiag solver
 dz = 0.05  # vertical grid spacing (in meters)
-dt = 60  # time step in seconds
+dt = 1800  # time step in seconds
 depth = dz * n  # the depth of the soil modeled
 kap = 8e-7  # soil diffusivity (m2 s-1)
 la = (dt * kap) / (dz ** 2)  # la as defined with dt*kappa/dz^2 (unitless)
-time_steps = 300  # number of time steps to calculate
+time_steps = 400  # number of time steps to calculate
 T_bar = 20.  # Average temperature of bottom layer
 A = 10.  # Amplitude of sine wave for surface layer
 
@@ -151,10 +151,6 @@ b = np.full(n_coeffs, 0.)
 c = np.full(n_coeffs, 0.)
 d = np.full(n_coeffs, 0.)
 
-
-
-
-
 ## 2. Finding the coefficents for a, b, c, d
 for i, t in enumerate(tao[1:-1]):
 
@@ -178,7 +174,7 @@ for i, t in enumerate(tao[1:-1]):
         c[depth] = -la
         d[depth] = Temps[depth, Temp_idx - 1]
 
-    print(f"a: {a}, b: {b},\n c: {c}, d: {d}")
+    print(f"a: {a},\nb: {b},\nc: {c},\nd: {d}")
 
     Temps[1:-1, Temp_idx] = TDMAsolver(a[1:], b, c[:-1], d)
 
