@@ -146,8 +146,8 @@ print(Temps)
 # Coefficient matrix for tridiagonal solver
 coeffs = np.full((n_coeffs, 4), 0.)
 
-a = np.full(n_coeffs, 0.)
-b = np.full(n_coeffs, 0.)
+a = np.full(n_coeffs)
+b = np.full(n_coeffs)
 c = np.full(n_coeffs, 0.)
 d = np.full(n_coeffs, 0.)
 
