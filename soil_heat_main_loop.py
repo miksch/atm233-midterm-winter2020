@@ -4,6 +4,7 @@ import soil_funcs
 from tdma import *
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 for num_depths in [10, 20, 30, 50, 100, 150]:
     num_coeffs = num_depths - 2
@@ -41,15 +42,22 @@ for num_depths in [10, 20, 30, 50, 100, 150]:
                 Temps = soil_funcs.calc_temps_vector(a, b, c, d, tau, Temps, la, num_coeffs)
                 x, y = np.meshgrid(tau, depths)
 
+                # Create and save data
+                os.makedirs(f"data/dz_{dz}/dt_{dt}".replace('.', '_'), exist_ok=True)
                 da = xr.DataArray(Temps, coords=[('depth', depths), ('tau', tau)]).to_dataset(name='temp')
-                da.to_netcdf(f"data/dz_{str(dz).replace('.', '_')}_nd_{num_depths}_dt_{dt}_ts_{time_steps}.nc")
+                da.to_netcdf(
+                    f"data/dz_{dz}/dt_{dt}/dz_{dz}_nd_{num_depths}_dt_{dt}_ts_{time_steps}_k_{kap:.2e}_la_{la:.2f}".replace(
+                        '.', '_') + ".nc")
 
-                fig, ax = plt.subplots(**{'figsize' : (10, 5)})
+                # Create and save figures
+                os.makedirs(f"figures/output/dz_{dz}/dt_{dt}".replace('.', '_'), exist_ok=True)
+                fig, ax = plt.subplots(**{'figsize': (10, 5)})
                 mesh = ax.pcolormesh(x, y, Temps)
                 ax.set_xlabel('Time [s]')
                 ax.set_ylabel('Depth [m]')
-                fig.suptitle(f"dz: {str(dz).replace('.', '_')}, num_depths: {num_depths}, dt: {dt}, ts: {time_steps}")
-                fig.tight_layout()
-                fig.savefig(f"figures/dz_{str(dz).replace('.', '_')}_nd_{num_depths}_dt_{dt}_ts_{time_steps}.png", dpi=300)
-
-
+                fig.suptitle(
+                    f"dz: {dz}, num_depths: {num_depths}, dt: {dt}, ts: {time_steps}, k: {kap:.2e}, la: {la:.2f}")
+                fig.colorbar(mesh, label=r'Temperature [$\degree C$]')
+                fig.savefig(
+                    f"figures/output/dz_{dz}/dt_{dt}/dz_{dz}_nd_{num_depths}_dt_{dt}_ts_{time_steps}_k_{kap:.2e}_la_{la:.2f}".replace(
+                        '.', '_') + ".png", dpi=300)

@@ -35,18 +35,18 @@ Temps = soil_funcs.calc_temps_vector(a, b, c, d, tau, Temps, la, num_coeffs)
 x, y = np.meshgrid(tau, depths)
 
 # Create and save data
-os.makedirs(f"data", exist_ok=True)
+os.makedirs(f"data/single_runs".replace('.', '_'), exist_ok=True)
 da = xr.DataArray(Temps, coords=[('depth', depths), ('tau', tau)]).to_dataset(name='temp')
-da.to_netcdf(f"data/dz_{dz}_nd_{num_depths}_dt_{dt}_ts_{time_steps}_k_{kap:.2e}".replace('.', '_')+".nc")
+da.to_netcdf(f"data/single_runs/dz_{dz}_nd_{num_depths}_dt_{dt}_ts_{time_steps}_k_{kap:.2e}_la_{la:.2f}".replace('.', '_')+".nc")
 
 # Create and save figures
-os.makedirs(f"figures/output", exist_ok=True)
+os.makedirs(f"figures/output/single_runs".replace('.', '_'), exist_ok=True)
 fig, ax = plt.subplots(**{'figsize': (10, 5)})
 mesh = ax.pcolormesh(x, y, Temps)
 ax.set_xlabel('Time [s]')
 ax.set_ylabel('Depth [m]')
-fig.suptitle(f"dz: {str(dz).replace('.', '_')}, num_depths: {num_depths}, dt: {dt}, ts: {time_steps}, k:{kap:.2e}")
+fig.suptitle(f"dz: {dz}, num_depths: {num_depths}, dt: {dt}, ts: {time_steps}, k: {kap:.2e}, la: {la:.2f}")
 fig.colorbar(mesh, label=r'Temperature [$\degree C$]')
-fig.savefig(f"figures/output/dz_{dz}_nd_{num_depths}_dt_{dt}_ts_{time_steps}_k_{kap:.2e}".replace('.', '_')+".png", dpi=300)
+fig.savefig(f"figures/output/single_runs/dz_{dz}_nd_{num_depths}_dt_{dt}_ts_{time_steps}_k_{kap:.2e}_la_{la:.2f}".replace('.', '_')+".png", dpi=300)
 
 
