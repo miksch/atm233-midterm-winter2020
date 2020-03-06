@@ -2,7 +2,11 @@ import numpy as np
 from numba import jit
 
 # Tridiag solver from Carnahan
+# Not used in main program
 def TDMAsolver_carnahan(A, B, C, D):
+    """
+    Our solution for the TDMA solver based on carnahan (not used in main program)
+    """
     # send the vectors a, b, c, d with the coefficents
 
     vector_len = D.shape[0]  # defines the length of the coefficent vector (including a = 0)
@@ -27,7 +31,7 @@ def TDMAsolver_carnahan(A, B, C, D):
 
 ## Tri Diagonal Matrix Algorithm(a.k.a Thomas algorithm) solver
 # https://gist.github.com/cbellei/8ab3ab8551b8dfc8b081c518ccd9ada9
-# Modified to take in coefficient array
+# Not used in main program (slow)
 def TDMAsolver_no_vec(a, b, c, d):
     """
     TDMA solver, a b c d can be NumPy array type or Python list type.
@@ -55,7 +59,10 @@ def TDMAsolver_no_vec(a, b, c, d):
 
     return xc
 
-# https://stackoverflow.com/questions/8733015/tridiagonal-matrix-algorithm-tdma-aka-thomas-algorithm-using-python-with-nump
+# Compiled TDMA solver
+# https://stackoverflow.com/questions/8733015/tridiagonal-matrix-algorithm- \
+# tdma-aka-thomas-algorithm-using-python-with-nump
+# Used in main program
 @jit
 def TDMAsolver(a, b, c, d):
     # Set up diagonal coefficients
